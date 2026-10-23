@@ -82,3 +82,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;
 .bigbtn:disabled{opacity:.5;cursor:default}
 #fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:30}
 .card-icon.two{font-size:calc(var(--u)*8.5*var(--s))}
+.cl.has-extra .card-icon{font-size:calc(var(--u)*9.5*var(--s));margin-bottom:calc(var(--u)*1.2*var(--s))}
+.cl.has-extra .card-icon.two{font-size:calc(var(--u)*7*var(--s))}
+.cl.has-extra{gap:calc(var(--u)*1.2*var(--s))}
+.bigbtn,.hub,.chip,.tbtn{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.card-inner{animation-duration:.6s,2s}

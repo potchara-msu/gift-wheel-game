@@ -81,14 +81,16 @@
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, a0, a0 + SEGA); ctx.closePath();
       ctx.fillStyle = gr; ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = '#fff'; ctx.stroke();
       ctx.save(); ctx.rotate(a0 + SEGA / 2);
+      var mid = a0 + SEGA / 2 + angle, flip = Math.cos(mid) < 0, sx = 1; // ครึ่งซ้าย: หมุนตัวอักษร 180° ให้อ่านได้ตั้งตรง
+      if (flip) { ctx.rotate(Math.PI); sx = -1; }
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 8;
-      ctx.font = '96px ' + FONT; ctx.fillText(s.icon.length > 2 ? '🎁' : s.icon, R * 0.83, 0);
+      ctx.font = '96px ' + FONT; ctx.fillText(s.icon.length > 2 ? '🎁' : s.icon, sx * R * 0.83, 0);
       ctx.shadowBlur = 0;
       var fs = 84; ctx.font = '900 ' + fs + 'px ' + FONT;
       while (ctx.measureText(s.short).width > R * 0.44 && fs > 30) { fs -= 2; ctx.font = '900 ' + fs + 'px ' + FONT; }
       ctx.lineJoin = 'round'; ctx.lineWidth = Math.round(fs / 5); ctx.strokeStyle = 'rgba(30,10,40,.85)';
-      ctx.strokeText(s.short, R * 0.48, 4); ctx.fillStyle = '#fff'; ctx.fillText(s.short, R * 0.48, 4);
+      ctx.strokeText(s.short, sx * R * 0.48, 4); ctx.fillStyle = '#fff'; ctx.fillText(s.short, sx * R * 0.48, 4);
       ctx.restore();
     }
     ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.lineWidth = 20; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
@@ -121,6 +123,11 @@
     showCard(seg, note, wasExtra);
   }
 
+  // กดปุ่มด้วยเมาส์/นิ้ว: ทำงานทันทีตอน pointerdown (ไม่หายแม้ปุ่มกำลังขยับระหว่างแอนิเมชัน)
+  function onTap(el, fn) {
+    el.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; e.preventDefault(); fn(e); });
+    el.addEventListener('click', function (e) { if (e.detail === 0) fn(e); }); // คลิกจากคีย์บอร์ด
+  }
   /* ---------- การ์ด ---------- */
   var timerId = null, left = 10, mission = 'none', cardView = false; // mission: none | idle | running | done
   var CLOSE_HINT = 'แตะจอ หรือกด Spacebar เพื่อหมุนต่อ';
@@ -130,12 +137,12 @@
     if (mission === 'idle') h = '⏱ กด Spacebar เพื่อเริ่มนับ 10 วิ · ปิดการ์ดได้เมื่อหมดเวลา';
     else if (mission === 'running') h = '⏳ กำลังนับ... ปิดการ์ดได้เมื่อหมดเวลา';
     else if (mission === 'done') h = '⏰ หมดเวลา! แตะจอ หรือกด Spacebar เพื่อปิด';
-    else if (cardOpen === 7 && !cardView) h = 'กด Spacebar เพื่อหมุนอีกรอบ · Esc / แตะข้างนอก = ไม่หมุน';
+    else if (cardOpen === 7 && !cardView) h = '🔄 กดปุ่ม "หมุนเลย!" หรือ Spacebar เพื่อหมุนอีกรอบ';
     else if (cardView) h = 'ดูย้อนหลัง · แตะจอ หรือกด Spacebar เพื่อปิด';
     $('cClose').textContent = h;
     var bt = document.querySelector('[data-act=timer]'); if (bt) bt.disabled = mission === 'running';
   }
-  function canClose() { return mission === 'none' || mission === 'done'; }
+  function canClose() { return (mission === 'none' || mission === 'done') && !(cardOpen === 7 && !cardView); }
   function showCard(seg, note, wasExtra, view) {
     var s = SEGS[seg - 1]; cardOpen = seg; cardView = !!view; stopTimer();
     mission = seg === 3 ? 'idle' : 'none';
@@ -145,6 +152,7 @@
     var ex = $('cExtra'); ex.innerHTML = '';
     if (seg === 3) { ex.innerHTML = '<div class="timer" id="cTimer">10</div><button class="bigbtn" data-act="timer">⏱ เริ่ม 10 วิ</button>'; }
     if (seg === 7 && !view) { ex.innerHTML = '<button class="bigbtn" data-act="again">🔄 หมุนเลย!</button>'; }
+    document.querySelector('.cl').classList.toggle('has-extra', !!ex.innerHTML);
     setHint();
     var inner = card.querySelector('.card-inner'); inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = '';
     $('overlay').classList.remove('hidden'); fit();
@@ -170,9 +178,10 @@
     }, 1000);
   }
   function spinAgain() { extraSpin = true; closeCard(); spin(); }
-  $('overlay').addEventListener('click', function (e) {
+  onTap($('overlay'), function (e) {
     var b = e.target.closest('[data-act]');
-    if (b) { e.stopPropagation(); if (b.disabled) return; if (b.dataset.act === 'timer') startTimer(); else if (b.dataset.act === 'again') spinAgain(); return; }
+    if (b) { if (b.disabled) return; if (b.dataset.act === 'timer') startTimer(); else if (b.dataset.act === 'again') spinAgain(); return; }
+    if (mission === 'idle' && e.target.closest('.card-inner')) { startTimer(); return; } // แตะการ์ดภารกิจ = เริ่มนับ
     if (!canClose()) { nudge(); return; }
     if (cardOpen === 7) extraSpin = false;
     closeCard();
@@ -183,7 +192,7 @@
   function renderHist() {
     $('hist').innerHTML = history.map(function (n) { var s = SEGS[n - 1]; return '<button class="chip" data-n="' + n + '" style="background:' + s.color + '">' + (s.icon.length > 2 ? '🎁🎁' : s.icon) + ' ' + n + ' ' + s.short + '</button>'; }).join('');
   }
-  $('hist').addEventListener('click', function (e) {
+  onTap($('hist'), function (e) {
     var c = e.target.closest('[data-n]'); if (!c || spinning || cardOpen) return;
     ac(); showCard(+c.dataset.n, '', false, true);
   });
@@ -197,13 +206,13 @@
     if (!(d.fullscreenElement || d.webkitFullscreenElement)) (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
     else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
   });
-  $('btnSpin').addEventListener('click', spin);
+  onTap($('btnSpin'), function () { if (!cardOpen) spin(); });
   document.addEventListener('keydown', function (e) {
     if (e.code === 'Space' || e.code === 'Enter') {
       e.preventDefault(); if (e.repeat || spinning) return;
       if (cardOpen && mission === 'idle') startTimer();          // ภารกิจ: Space = เริ่มนับ
+      else if (cardOpen === 7 && !cardView) spinAgain();          // หมุนอีกรอบ: Space = หมุนเลย
       else if (cardOpen && !canClose()) nudge();                  // กำลังนับ: ปิดไม่ได้
-      else if (cardOpen === 7 && !cardView) spinAgain();
       else if (cardOpen) closeCard();
       else spin();
     } else if (e.code === 'Escape' && cardOpen) {
@@ -228,5 +237,5 @@
   }
 
   setMute(); renderHist(); drawWheel();
-  window.__wheel = { showCard: showCard, spin: spin, _result: function (s, x) { extraSpin = !!x; result(s); }, get open() { return cardOpen; }, get mission() { return mission; } };
+  window.__wheel = { showCard: showCard, spin: spin, _result: function (s, x) { extraSpin = !!x; result(s); }, _close: function () { closeCard(); }, _forceDone: function () { if (mission === 'running') { stopTimer(); mission = 'done'; setHint(); } }, get open() { return cardOpen; }, get mission() { return mission; } };
 })();

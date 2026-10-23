@@ -60,14 +60,16 @@
       wctx.beginPath(); wctx.moveTo(0, 0); wctx.arc(0, 0, R, a0, a0 + seg); wctx.closePath();
       wctx.fillStyle = COLORS[k]; wctx.fill(); wctx.lineWidth = 6; wctx.strokeStyle = '#fff'; wctx.stroke();
       wctx.save(); wctx.rotate(a0 + seg / 2);
-      wctx.textAlign = 'right'; wctx.textBaseline = 'middle'; wctx.fillStyle = '#fff';
+      var flip = Math.cos(a0 + seg / 2 + angle) < 0, sx = 1; // ครึ่งซ้าย: หมุนตัวอักษร 180° ให้อ่านได้ตั้งตรง
+      if (flip) { wctx.rotate(Math.PI); sx = -1; }
+      wctx.textAlign = flip ? 'left' : 'right'; wctx.textBaseline = 'middle'; wctx.fillStyle = '#fff';
       wctx.shadowColor = 'rgba(0,0,0,.6)'; wctx.shadowBlur = 6;
       var parts = LABELS[k].split(' '), num = parts.shift(), lab = parts.join(' '), fs = 40;
       wctx.font = 'bold ' + fs + 'px "Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif';
       while (wctx.measureText(lab).width > R - 180 && fs > 20) { fs -= 2; wctx.font = 'bold ' + fs + 'px "Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif'; }
-      wctx.fillText(lab, R - 28, 0);
+      wctx.fillText(lab, sx * (R - 28), 0);
       wctx.font = 'bold 54px sans-serif'; wctx.fillStyle = 'rgba(255,255,255,.95)';
-      wctx.textAlign = 'center'; wctx.fillText(num, 122, 0);
+      wctx.textAlign = 'center'; wctx.fillText(num, sx * 122, 0);
       wctx.restore();
     }
     wctx.beginPath(); wctx.arc(0, 0, R, 0, Math.PI * 2); wctx.lineWidth = 14; wctx.strokeStyle = '#ffd23f'; wctx.stroke();
@@ -130,7 +132,8 @@
       timeLeft--;
       if (timeLeft <= 0) { stopTimer(); timeLeft = 0; SFX.buzzer(); toast('⏰ หมดเวลา!', 1500); }
       else SFX.count(timeLeft <= 3);
-      renderPanel();
+      var tEl = document.querySelector('#panel .timer'); // อัปเดตเฉพาะตัวเลข ไม่สร้างปุ่มใหม่ (กันคลิกหาย)
+      if (tEl) { tEl.textContent = timeLeft; tEl.classList.toggle('low', timeLeft <= 3); }
     }, 1000);
   }
   function stopTimer() { if (timerId) clearInterval(timerId); timerId = null; }
@@ -237,7 +240,12 @@
       SFX.tick(); renderBoard(); renderPanel();
     }
   }
-  $('panel').addEventListener('click', function (e) {
+  // กดด้วยเมาส์/นิ้ว: ทำงานตอน pointerdown ทันที (คลิกไม่หายแม้หน้าจอกำลังอัปเดต) · คลิกจากคีย์บอร์ดยังใช้ได้
+  function onTap(el, fn) {
+    el.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; e.preventDefault(); fn(e); });
+    el.addEventListener('click', function (e) { if (e.detail === 0) fn(e); });
+  }
+  onTap($('panel'), function (e) {
     var b = e.target.closest('button'); if (!b || b.disabled) return;
     if (b.dataset.t !== undefined) return pickTarget(+b.dataset.t);
     var a = b.dataset.a;
@@ -247,8 +255,8 @@
     else if (a === 'timer') { startTimer(); renderPanel(); }
     else if (a === 'showend') showEnd();
   });
-  $('board').addEventListener('click', function (e) { var c = e.target.closest('.pcard'); if (c) pickTarget(+c.dataset.p); });
-  $('btnSpin').addEventListener('click', doSpin);
+  onTap($('board'), function (e) { var c = e.target.closest('.pcard'); if (c) pickTarget(+c.dataset.p); });
+  onTap($('btnSpin'), function () { if (!$('btnSpin').disabled) doSpin(); });
   $('btnUndo').addEventListener('click', undo);
   $('btnMute').addEventListener('click', function () { muted = !muted; save(); render(); });
   document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { b.closest('.modal').classList.add('hidden'); }); });
@@ -311,6 +319,7 @@
     var s = state;
     $('endSummary').innerHTML = 'ผู้เล่น ' + s.n + ' คน · ของขวัญ ' + s.gifts + ' ชิ้น · เล่นทั้งหมด <b>' + s.turn + '</b> ตา' + (s.leftover ? ' · ของเหลือ ' + s.leftover + ' ชิ้น' : '') + '<br>ลำดับคนที่ได้ของครบก่อน:';
     $('endList').innerHTML = s.outOrder.map(function (i, k) { return '<div>' + (k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : (k + 1) + '.') + ' ' + name(i) + '</div>'; }).join('');
+    clearTimeout(toastT); $('toast').classList.add('hidden'); // ไม่ให้ป้าย "ออกจากเกม" ทับหัวสรุป
     $('endModal').classList.remove('hidden'); confetti();
   }
   function confetti() {

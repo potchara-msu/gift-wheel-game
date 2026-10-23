@@ -32,9 +32,9 @@ textarea{width:100%;font:inherit;font-size:1.2rem;border-radius:14px;border:0;pa
 .topbar{display:flex;align-items:center;gap:1rem;padding:.5rem 1rem;background:rgba(0,0,0,.3)}
 .stat{font-size:1.5rem} .stat b{color:var(--gold);font-size:1.8rem}
 .spacer{flex:1}
-.layout{flex:1;display:grid;grid-template-columns:minmax(380px,40%) 1fr;gap:1rem;padding:1rem;min-height:0}
+.layout{flex:1;display:grid;grid-template-columns:minmax(380px,40%) 1fr;grid-template-rows:minmax(0,1fr);gap:1rem;padding:1rem;min-height:0}
 .left{display:flex;flex-direction:column;align-items:center;min-height:0}
-.wheel-wrap{position:relative;width:min(38vw,56vh);aspect-ratio:1}
+.wheel-wrap{position:relative;width:min(38vw,50vh);aspect-ratio:1;flex:none}
 #wheel{width:100%;height:100%;filter:drop-shadow(0 10px 25px rgba(0,0,0,.5))}
 .pointer{position:absolute;top:-2.2vh;left:50%;transform:translateX(-50%);font-size:min(5vw,7vh);color:var(--gold);z-index:2;text-shadow:0 3px 6px #000;line-height:1}
 .spin-hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22%;aspect-ratio:1;border-radius:50%;border:6px solid #fff;background:radial-gradient(circle,#ff7b54,#e63946);color:#fff;font:inherit;font-weight:800;font-size:min(2.2vw,3.2vh);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.5)}
@@ -79,3 +79,9 @@ textarea{width:100%;font:inherit;font-size:1.2rem;border-radius:14px;border:0;pa
 .end-list div{background:rgba(255,255,255,.08);border-radius:12px;padding:.4rem .7rem}
 .toast{position:fixed;left:50%;top:12%;transform:translateX(-50%);background:var(--gold);color:#3a2300;font-size:2rem;font-weight:800;padding:.6rem 1.6rem;border-radius:20px;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.5);text-align:center;max-width:90vw}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:70;width:100vw;height:100vh}
+#endModal:not(.hidden) ~ .toast{display:none!important}
+@media (max-height:820px){
+  .panel{padding:.6rem .8rem}.panel h2{font-size:1.45rem;margin:0 0 .2rem}.panel p{font-size:1.1rem;margin:.2rem 0}
+  .panel .seg-badge{font-size:1.15rem}.timer{font-size:3.2rem}.btn.big{font-size:1.2rem;padding:.45em 1em}
+  .targets{gap:.35rem;margin:.35rem 0}.targets .btn{font-size:1rem}.wheel-wrap{width:min(34vw,46vh)}
+}
