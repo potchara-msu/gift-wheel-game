@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎁 วงล้อจับสลากของขวัญ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>🎁 วงล้อจับสลากของขวัญ 🎡</h1>
+  <div class="tools">
+    <button id="btnMute" class="tbtn" title="เปิด/ปิดเสียง">🔊</button>
+    <button id="btnFull" class="tbtn" title="เต็มจอ">⛶</button>
+  </div>
+</header>
+
+<main class="stage">
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="1000" height="1000"></canvas>
+    <button id="btnSpin" class="hub">หมุน!</button>
+  </div>
+</main>
+
+<footer class="history">
+  <span class="hlabel">ผลล่าสุด:</span>
+  <div id="hist" class="hchips"></div>
+  <button id="btnClear" class="tbtn small" title="ล้างประวัติ">ล้าง</button>
+</footer>
+
+<div id="overlay" class="overlay hidden">
+  <div id="card" class="card">
+    <div class="card-inner" id="cardInner">
+      <div class="cl">
+        <div class="card-num" id="cNum">ช่อง 1</div>
+        <div class="card-icon" id="cIcon">🎁</div>
+        <div class="card-extra" id="cExtra"></div>
+      </div>
+      <div class="cr">
+        <div class="card-title" id="cTitle">หยิบ 1 ชิ้น</div>
+        <div class="card-note" id="cNote"></div>
+        <div class="card-text" id="cText"></div>
+      </div>
+      <div class="card-remind">📌 มีเกิน 1 ชิ้นแกะได้ 1 · ชิ้นเดียวแกะไม่ได้ · แกล้ง/ปล้นได้แค่ของที่ยังห่อ</div>
+      <div class="card-close" id="cClose">แตะจอ หรือกด Spacebar เพื่อหมุนต่อ</div>
+    </div>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+<script src="app.js"></script>
+</body>
+</html>

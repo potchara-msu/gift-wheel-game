@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎁 วงล้อจับสลากของขวัญ (เวอร์ชันเต็ม)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- หน้าตั้งค่า -->
+<section id="setup" class="screen">
+  <div class="setup-card">
+    <h1>🎁 วงล้อจับสลากของขวัญ 🎡</h1>
+    <p class="sub">งานเลี้ยงนิสิตในที่ปรึกษา</p>
+    <div class="row">
+      <label>จำนวนผู้เล่น <input type="number" id="inPlayers" min="2" max="60" value="20"></label>
+      <label>จำนวนของขวัญ <input type="number" id="inGifts" min="4" max="200" value="40"></label>
+      <button id="btnAutoGifts" class="btn small">= 2 เท่าของคน</button>
+    </div>
+    <p class="hint">ใส่ชื่อผู้เล่นบรรทัดละ 1 คน เรียงตามลำดับที่นั่ง (วนตามเข็มนาฬิกา)</p>
+    <textarea id="inNames" rows="10"></textarea>
+    <p id="setupWarn" class="warn"></p>
+    <div class="row center">
+      <button id="btnStart" class="btn big green">▶ เริ่มเกม</button>
+      <button id="btnResume" class="btn big blue hidden">⏯ เล่นเกมเดิมต่อ</button>
+      <button id="btnRules" class="btn big">📜 กติกา</button>
+    </div>
+  </div>
+</section>
+
+<!-- หน้าเกม -->
+<section id="game" class="screen hidden">
+  <header class="topbar">
+    <div class="stat">ตาที่ <b id="sTurn">1</b></div>
+    <div class="stat">🎁 กองเหลือ <b id="sPile">40</b></div>
+    <div class="stat">👥 ยังเล่นอยู่ <b id="sActive">20</b></div>
+    <div class="spacer"></div>
+    <button id="btnUndo" class="btn small">↶ ย้อนกลับ</button>
+    <button id="btnMute" class="btn small">🔊 เสียง</button>
+    <button id="btnRules2" class="btn small">📜 กติกา</button>
+    <button id="btnSetup" class="btn small">⚙️ ตั้งค่า</button>
+    <button id="btnReset" class="btn small red">🗑 เริ่มใหม่</button>
+  </header>
+  <main class="layout">
+    <div class="left">
+      <div class="wheel-wrap">
+        <div class="pointer">▼</div>
+        <canvas id="wheel" width="800" height="800"></canvas>
+        <button id="btnSpin" class="spin-hub">หมุน!</button>
+      </div>
+      <div id="panel" class="panel"></div>
+    </div>
+    <div class="right">
+      <div id="board" class="board"></div>
+      <div class="log-wrap"><h3>📝 บันทึกเกม</h3><ol id="log" class="log"></ol></div>
+    </div>
+  </main>
+</section>
+
+<!-- กติกา -->
+<div id="rulesModal" class="modal hidden">
+  <div class="modal-card rules">
+    <h2>📜 กติกา</h2>
+    <p><b>ทุกช่อง:</b> ทำตามช่องเสร็จแล้ว ถ้าในมือมีเกิน 1 ชิ้น แกะได้ 1 ชิ้นในตาเดียวกัน</p>
+    <ol>
+      <li><b>หยิบ 1 ชิ้น</b> — หยิบจากกอง 1 ชิ้น</li>
+      <li><b>หยิบ 2 ชิ้น</b> — หยิบจากกอง 2 ชิ้นเก็บเอง</li>
+      <li><b>ภารกิจ</b> — คนฝั่งตรงข้ามมีเวลาคิด 10 วินาที สั่งภารกิจ: ทำได้ → หยิบ 1 / ไม่ทำ → ข้ามไปคนถัดไป / คนสั่งคิดไม่ทันหรือวงไม่โอเค → คนหมุนหยิบ 1 เลย</li>
+      <li><b>ยัดเยียด</b> — หยิบจากกอง 2 ชิ้น เก็บ 1 อีกชิ้นยัดให้ใครก็ได้ในวง</li>
+      <li><b>สลับมั่ว</b> — สั่งเพื่อน 2 คนสลับของที่ยังห่อกัน 1 ชิ้น แล้วตัวเองหยิบจากกอง 1 ชิ้น</li>
+      <li><b>โรบินฮู้ดจอมแสบ</b> — ปล้นของที่ยังห่อจากใครก็ได้ 1 ชิ้น</li>
+      <li><b>หมุนอีกรอบ</b> — ครั้งเดียวต่อตา ถ้าได้ 7 ซ้ำนับเป็นช่อง 1</li>
+      <li><b>หยิบ+แกะ</b> — หยิบจากกอง 1 ชิ้น แล้วต้องแกะ 1 ชิ้นแน่นอน (ถ้าในมือมีเกิน 1 ชิ้น)</li>
+    </ol>
+    <ul>
+      <li>ในมือ = แกะแล้ว + ยังห่อ · มีชิ้นเดียวแกะไม่ได้</li>
+      <li>ชิ้นที่แกะแล้วเป็นของคนนั้น ห้ามแลก/ปล้น · แกล้งได้เฉพาะของที่ยังห่อ</li>
+      <li>ใครแกะครบ 2 ชิ้น ออกจากเกมทันที ของห่อที่เหลือแจกให้คนที่มีน้อยที่สุดก่อน · ห้ามแกล้งคนที่ออกแล้ว</li>
+      <li>กองหมดแล้วเล่นต่อ: ช่องที่ให้หยิบจากกอง เปลี่ยนเป็นขอของห่อจากคนที่มีของห่อเยอะที่สุด 1 ชิ้น (เฉพาะตอนที่ในมือเรามีไม่ถึง 2 ชิ้น)</li>
+      <li>จบเมื่อทุกคนแกะครบ 2 ชิ้น</li>
+    </ul>
+    <div class="row center"><button class="btn big" data-close>ปิด</button></div>
+  </div>
+</div>
+
+<!-- จบเกม -->
+<div id="endModal" class="modal hidden">
+  <div class="modal-card end">
+    <h2>🏆 จบเกม! 🎉</h2>
+    <p id="endSummary"></p>
+    <div id="endList" class="end-list"></div>
+    <div class="row center">
+      <button class="btn big" data-close>ดูกระดาน</button>
+      <button id="btnNewGame" class="btn big green">🎲 เกมใหม่</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<canvas id="confetti"></canvas>
+
+<script src="game.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
