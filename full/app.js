@@ -66,8 +66,10 @@
       wctx.shadowColor = 'rgba(0,0,0,.6)'; wctx.shadowBlur = 6;
       var parts = LABELS[k].split(' '), num = parts.shift(), lab = parts.join(' '), fs = 40;
       wctx.font = 'bold ' + fs + 'px "Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif';
-      while (wctx.measureText(lab).width > R - 180 && fs > 20) { fs -= 2; wctx.font = 'bold ' + fs + 'px "Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif'; }
-      wctx.fillText(lab, sx * (R - 28), 0);
+      while (wctx.measureText(lab).width > R - 235 && fs > 20) { fs -= 2; wctx.font = 'bold ' + fs + 'px "Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif'; }
+      wctx.fillText(lab, sx * (R - 95), 0);
+      wctx.save(); wctx.textAlign = 'center'; wctx.font = '52px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+      wctx.fillText(ICONS[k].length > 2 ? '\ud83c\udf6c' : ICONS[k], sx * (R - 50), 2); wctx.restore();
       wctx.font = 'bold 54px sans-serif'; wctx.fillStyle = 'rgba(255,255,255,.95)';
       wctx.textAlign = 'center'; wctx.fillText(num, sx * 122, 0);
       wctx.restore();
