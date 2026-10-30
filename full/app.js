@@ -5,9 +5,9 @@
   var KEY = 'giftWheelGame.v1', SKEY = 'giftWheelGame.setup.v1';
   var $ = function (id) { return document.getElementById(id); };
   var state = null, hist = [], muted = false, spinning = false, swapSel = [];
-  var COLORS = ['#ff595e', '#ff924c', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ff5fa2', '#00b4a6'];
+  var COLORS = ['#ff7518', '#ff9f1c', '#9b5de5', '#70e000', '#5a189a', '#3c096c', '#d00000', '#2d6a4f'];
   var LABELS = ['1 หยิบ 1 ชิ้น', '2 หยิบ 2 ชิ้น', '3 ภารกิจ', '4 ยัดเยียด', '5 สลับมั่ว', '6 โรบินฮู้ด', '7 หมุนอีกรอบ', '8 หยิบ+แกะ'];
-  var ICONS = ['🎁', '🎁🎁', '🎯', '😈', '🔀', '🏹', '🔄', '✨'];
+  var ICONS = ['🍬', '🍬🍬', '🧙', '👻', '🦇', '💀', '🌕', '🎃'];
 
   /* ---------------- เสียง (Web Audio ไม่ต้องใช้ไฟล์) ---------------- */
   var AC = null;
@@ -72,8 +72,8 @@
       wctx.textAlign = 'center'; wctx.fillText(num, sx * 122, 0);
       wctx.restore();
     }
-    wctx.beginPath(); wctx.arc(0, 0, R, 0, Math.PI * 2); wctx.lineWidth = 14; wctx.strokeStyle = '#ffd23f'; wctx.stroke();
-    for (var d = 0; d < 32; d++) { var aa = d * Math.PI / 16; wctx.beginPath(); wctx.arc(Math.cos(aa) * (R - 1), Math.sin(aa) * (R - 1), 6, 0, 7); wctx.fillStyle = d % 2 ? '#fff' : '#ff5fa2'; wctx.fill(); }
+    wctx.beginPath(); wctx.arc(0, 0, R, 0, Math.PI * 2); wctx.lineWidth = 14; wctx.strokeStyle = '#ff7518'; wctx.stroke();
+    for (var d = 0; d < 32; d++) { var aa = d * Math.PI / 16; wctx.beginPath(); wctx.arc(Math.cos(aa) * (R - 1), Math.sin(aa) * (R - 1), 6, 0, 7); wctx.fillStyle = d % 2 ? '#f5f0e1' : '#9b5de5'; wctx.fill(); }
     wctx.restore();
   }
   function segAt(a) { var s = Math.PI * 2 / 8, x = ((-a) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); return Math.floor(x / s); }

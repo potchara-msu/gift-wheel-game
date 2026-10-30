@@ -4,21 +4,21 @@
   var $ = function (id) { return document.getElementById(id); };
   var FONT = '"Sukhumvit Set","Thonburi","Leelawadee UI","Noto Sans Thai",sans-serif';
   var SEGS = [
-    { n: 1, short: 'หยิบ 1', title: 'หยิบ 1 ชิ้น', icon: '🎁', color: '#ff595e', snd: 'gift',
+    { n: 1, short: 'หยิบ 1', title: 'หยิบ 1 ชิ้น', icon: '🍬', color: '#ff7518', snd: 'gift',
       text: 'หยิบของขวัญจากกอง<br><b>1 ชิ้น</b>' },
-    { n: 2, short: 'หยิบ 2', title: 'หยิบ 2 ชิ้น', icon: '🎁🎁', color: '#ff924c', snd: 'double',
+    { n: 2, short: 'หยิบ 2', title: 'หยิบ 2 ชิ้น', icon: '🍬🍬', color: '#ff9f1c', snd: 'double',
       text: 'หยิบจากกอง <b>2 ชิ้น</b><br>เก็บเองทั้งหมด!' },
-    { n: 3, short: 'ภารกิจ', title: 'ภารกิจ!', icon: '🎯', color: '#e0a800', snd: 'mission',
+    { n: 3, short: 'ภารกิจ', title: 'ภารกิจ!', icon: '🧙', color: '#9b5de5', snd: 'mission',
       text: 'คนนั่งตรงข้ามคิดภารกิจ 10 วิ<ul><li>ทำได้ → หยิบ 1 ชิ้น</li><li>ไม่ทำ → ข้ามไปคนถัดไป</li><li>คิดไม่ทัน/วงไม่โอเค → หยิบเลย</li></ul>' },
-    { n: 4, short: 'ยัดเยียด', title: 'ยัดเยียด', icon: '😈', color: '#5fa31a', snd: 'give',
+    { n: 4, short: 'ยัดเยียด', title: 'ยัดเยียด', icon: '👻', color: '#70e000', snd: 'give',
       text: 'หยิบจากกอง <b>2 ชิ้น</b> เก็บ 1<br>อีกชิ้น<b>ยัดให้ใครก็ได้!</b>' },
-    { n: 5, short: 'สลับมั่ว', title: 'สลับมั่ว', icon: '🔀', color: '#1982c4', snd: 'swap',
+    { n: 5, short: 'สลับมั่ว', title: 'สลับมั่ว', icon: '🦇', color: '#5a189a', snd: 'swap',
       text: 'สั่งเพื่อน <b>2 คน</b> สลับของที่ยังห่อ<br>แล้วเราหยิบจากกอง 1 ชิ้น' },
-    { n: 6, short: 'ปล้น!', title: 'โรบินฮู้ดจอมแสบ', icon: '🏹', color: '#6a4c93', snd: 'steal',
+    { n: 6, short: 'ปล้น!', title: 'โรบินฮู้ดจอมแสบ', icon: '💀', color: '#3c096c', snd: 'steal',
       text: '<b>ปล้น</b>ของที่ยังห่อ<br>จากใครก็ได้ <b>1 ชิ้น!</b>' },
-    { n: 7, short: 'หมุนอีก', title: 'หมุนอีกรอบ!', icon: '🔄', color: '#ff5fa2', snd: 'again',
+    { n: 7, short: 'หมุนอีก', title: 'หมุนอีกรอบ!', icon: '🌕', color: '#d00000', snd: 'again',
       text: 'หมุนได้อีก <b>1 ครั้ง!</b><br><small>ได้ 7 ซ้ำ = นับเป็นช่อง 1</small>' },
-    { n: 8, short: 'หยิบ+แกะ', title: 'หยิบ + แกะ', icon: '✨', color: '#00a896', snd: 'unwrap',
+    { n: 8, short: 'หยิบ+แกะ', title: 'หยิบ + แกะ', icon: '🎃', color: '#2d6a4f', snd: 'unwrap',
       text: 'หยิบจากกอง 1 ชิ้น<br>แล้ว<b>ต้องแกะ 1 ชิ้น!</b><br><small>(ถ้าในมือมีเกิน 1 ชิ้น)</small>' }
   ];
   var muted = false, spinning = false, extraSpin = false, history = [], cardOpen = null;
@@ -85,7 +85,7 @@
       if (flip) { ctx.rotate(Math.PI); sx = -1; }
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 8;
-      ctx.font = '96px ' + FONT; ctx.fillText(s.icon.length > 2 ? '🎁' : s.icon, sx * R * 0.83, 0);
+      ctx.font = '96px ' + FONT; ctx.fillText(s.icon.length > 2 ? '🍬' : s.icon, sx * R * 0.83, 0);
       ctx.shadowBlur = 0;
       var fs = 84; ctx.font = '900 ' + fs + 'px ' + FONT;
       while (ctx.measureText(s.short).width > R * 0.44 && fs > 30) { fs -= 2; ctx.font = '900 ' + fs + 'px ' + FONT; }
@@ -93,8 +93,8 @@
       ctx.strokeText(s.short, sx * R * 0.48, 4); ctx.fillStyle = '#fff'; ctx.fillText(s.short, sx * R * 0.48, 4);
       ctx.restore();
     }
-    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.lineWidth = 20; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
-    for (var d = 0; d < 40; d++) { var aa = d * Math.PI / 20; ctx.beginPath(); ctx.arc(Math.cos(aa) * R, Math.sin(aa) * R, 7, 0, 7); ctx.fillStyle = d % 2 ? '#fff' : '#ff5fa2'; ctx.shadowColor = '#fff'; ctx.shadowBlur = d % 2 ? 12 : 0; ctx.fill(); }
+    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.lineWidth = 20; ctx.strokeStyle = '#ff7518'; ctx.stroke();
+    for (var d = 0; d < 40; d++) { var aa = d * Math.PI / 20; ctx.beginPath(); ctx.arc(Math.cos(aa) * R, Math.sin(aa) * R, 7, 0, 7); ctx.fillStyle = d % 2 ? '#f5f0e1' : '#9b5de5'; ctx.shadowColor = '#fff'; ctx.shadowBlur = d % 2 ? 12 : 0; ctx.fill(); }
     ctx.restore();
   }
   function segAt(a) { var x = ((-a) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); return Math.floor(x / SEGA); }
@@ -190,7 +190,7 @@
 
   /* ---------- ประวัติ (กดเพื่อเปิดการ์ดดูอีกครั้ง) ---------- */
   function renderHist() {
-    $('hist').innerHTML = history.map(function (n) { var s = SEGS[n - 1]; return '<button class="chip" data-n="' + n + '" style="background:' + s.color + '">' + (s.icon.length > 2 ? '🎁🎁' : s.icon) + ' ' + n + ' ' + s.short + '</button>'; }).join('');
+    $('hist').innerHTML = history.map(function (n) { var s = SEGS[n - 1]; return '<button class="chip" data-n="' + n + '" style="background:' + s.color + '">' + (s.icon.length > 2 ? '🍬🍬' : s.icon) + ' ' + n + ' ' + s.short + '</button>'; }).join('');
   }
   onTap($('hist'), function (e) {
     var c = e.target.closest('[data-n]'); if (!c || spinning || cardOpen) return;
@@ -225,7 +225,7 @@
   var fx = $('fx'), fctx = fx.getContext('2d'), parts = [], running = false;
   function burst(color) {
     fx.width = innerWidth; fx.height = innerHeight;
-    var cols = [color, '#ffd23f', '#fff', '#ff5fa2', '#4cc9f0'];
+    var cols = [color, '#ff7518', '#f5f0e1', '#9b5de5', '#70e000'];
     for (var i = 0; i < 160; i++) { var a = Math.random() * Math.PI * 2, v = 6 + Math.random() * 12; parts.push({ x: innerWidth / 2, y: innerHeight / 2, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4, r: Math.random() * 6, vr: (Math.random() - .5) * .4, s: 7 + Math.random() * 9, c: cols[i % cols.length], life: 120 + Math.random() * 60 }); }
     if (!running) { running = true; requestAnimationFrame(tickFx); }
   }
