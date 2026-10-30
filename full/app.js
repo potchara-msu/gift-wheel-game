@@ -9,6 +9,16 @@
   var LABELS = ['1 หยิบ 1 ชิ้น', '2 หยิบ 2 ชิ้น', '3 ภารกิจ', '4 ยัดเยียด', '5 สลับมั่ว', '6 โรบินฮู้ด', '7 หมุนอีกรอบ', '8 หยิบ+แกะ'];
   var ICONS = ['🍬', '🍬🍬', '🧙', '👻', '🦇', '💀', '🌕', '🎃'];
 
+  /* ---------------- Halloween file audio (ambient + stingers) ---------------- */
+  var HA = window.HalloweenAudio;
+  function unlockAll() { ac(); if (HA) HA.unlock(); }
+  function bindUnlockOnce() {
+    var once = function () { unlockAll(); document.removeEventListener('pointerdown', once, true); document.removeEventListener('keydown', once, true); };
+    document.addEventListener('pointerdown', once, true);
+    document.addEventListener('keydown', once, true);
+  }
+  // muted restored in load(); HA.init called after load attempt at bottom
+
   /* ---------------- เสียง (Web Audio ไม่ต้องใช้ไฟล์) ---------------- */
   var AC = null;
   function ac() { if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
@@ -223,10 +233,11 @@
   /* ---------------- interactions ---------------- */
   function doSpin() {
     if (spinning || state.phase !== 'spin') return;
-    spinning = true; render(); SFX.spin();
+    spinning = true; render(); unlockAll(); if (HA) HA.playCreak(); SFX.spin();
     var seg = 1 + Math.floor(Math.random() * 8);
     spinTo(seg, function () {
       spinning = false; SFX.land();
+      if (HA) HA.playSting();
       var was7again = state.spunAgain && seg === 7;
       dispatch({ type: 'spin', seg: seg });
       if (seg === 7 && !was7again) toast('🔄 หมุนอีกรอบ!', 1400);
@@ -260,7 +271,7 @@
   onTap($('board'), function (e) { var c = e.target.closest('.pcard'); if (c) pickTarget(+c.dataset.p); });
   onTap($('btnSpin'), function () { if (!$('btnSpin').disabled) doSpin(); });
   $('btnUndo').addEventListener('click', undo);
-  $('btnMute').addEventListener('click', function () { muted = !muted; save(); render(); });
+  $('btnMute').addEventListener('click', function () { unlockAll(); muted = !muted; if (HA) HA.setMuted(muted); save(); render(); });
   document.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', function () { b.closest('.modal').classList.add('hidden'); }); });
   $('btnRules').addEventListener('click', function () { $('rulesModal').classList.remove('hidden'); });
   $('btnRules2').addEventListener('click', function () { $('rulesModal').classList.remove('hidden'); });
@@ -311,7 +322,7 @@
     var names = readNames(), g = +$('inGifts').value;
     if (state && state.phase !== 'end' && !confirm('มีเกมที่เล่นค้างอยู่ จะเริ่มเกมใหม่แทนใช่ไหม?')) return;
     localStorage.setItem(SKEY, JSON.stringify({ names: names, gifts: g }));
-    ac(); state = GG.newGame(names, g); hist = []; save(); render(); SFX.gift();
+    unlockAll(); state = GG.newGame(names, g); hist = []; save(); render(); SFX.gift();
   });
 
   /* ---------------- toast / end / confetti ---------------- */
@@ -337,6 +348,8 @@
   /* ---------------- start ---------------- */
   drawWheel();
   if (load()) render(); else showSetup();
+  if (HA) HA.init('../assets/sounds/', muted);
+  bindUnlockOnce();
   window.addEventListener('resize', function () { });
   window.__gift = { get state() { return state; }, dispatch: dispatch, undo: undo, showEnd: showEnd };
 })();

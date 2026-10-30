@@ -25,6 +25,17 @@
   try { var sv = JSON.parse(localStorage.getItem('giftWheelSimple.v1') || '{}'); muted = !!sv.muted; history = sv.history || []; } catch (e) { }
   function save() { try { localStorage.setItem('giftWheelSimple.v1', JSON.stringify({ muted: muted, history: history })); } catch (e) { } }
 
+  /* ---------- Halloween file audio (ambient + stingers) ---------- */
+  var HA = window.HalloweenAudio;
+  if (HA) HA.init('assets/sounds/', muted);
+  function unlockAll() { ac(); if (HA) HA.unlock(); }
+  function bindUnlockOnce() {
+    var once = function () { unlockAll(); document.removeEventListener('pointerdown', once, true); document.removeEventListener('keydown', once, true); };
+    document.addEventListener('pointerdown', once, true);
+    document.addEventListener('keydown', once, true);
+  }
+  bindUnlockOnce();
+
   /* ---------- เสียง Web Audio ---------- */
   var AC = null;
   function ac() { if (!AC) { var C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
@@ -101,7 +112,7 @@
   function spin() {
     if (spinning) return;
     ac(); closeCard(true);
-    spinning = true; $('btnSpin').disabled = true; SFX.whoosh();
+    spinning = true; $('btnSpin').disabled = true; unlockAll(); if (HA) HA.playCreak(); SFX.whoosh();
     var seg = 1 + Math.floor(Math.random() * 8);
     var center = (seg - 1) * SEGA + SEGA / 2 + (Math.random() - 0.5) * SEGA * 0.75;
     var cur = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2); angle = cur;
@@ -120,6 +131,7 @@
     if (extraSpin && seg === 7) { seg = 1; note = '🔄 ได้ช่อง 7 ซ้ำ → นับเป็นช่อง 1'; }
     var wasExtra = extraSpin; extraSpin = false;
     history.unshift(seg); history = history.slice(0, 12); save(); renderHist();
+    if (HA) HA.playSting();
     showCard(seg, note, wasExtra);
   }
 
@@ -199,8 +211,8 @@
   $('btnClear').addEventListener('click', function () { history = []; save(); renderHist(); });
 
   /* ---------- ปุ่ม/คีย์ ---------- */
-  function setMute() { $('btnMute').textContent = muted ? '🔇' : '🔊'; }
-  $('btnMute').addEventListener('click', function () { muted = !muted; setMute(); save(); });
+  function setMute() { $('btnMute').textContent = muted ? '🔇' : '🔊'; if (HA) HA.setMuted(muted); }
+  $('btnMute').addEventListener('click', function () { unlockAll(); muted = !muted; setMute(); save(); });
   $('btnFull').addEventListener('click', function () {
     var d = document, el = d.documentElement;
     if (!(d.fullscreenElement || d.webkitFullscreenElement)) (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
