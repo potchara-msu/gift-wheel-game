@@ -85,7 +85,7 @@
       if (flip) { ctx.rotate(Math.PI); sx = -1; }
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 8;
-      ctx.font = '96px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",' + FONT; ctx.fillText(s.icon.length > 2 ? '🍬' : s.icon, sx * R * 0.83, 0);
+      ctx.fillStyle = '#000'; ctx.font = '96px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",' + FONT; ctx.fillText(s.icon.length > 2 ? '🍬' : s.icon, sx * R * 0.83, 0);
       ctx.shadowBlur = 0;
       var fs = 84; ctx.font = '900 ' + fs + 'px ' + FONT;
       while (ctx.measureText(s.short).width > R * 0.44 && fs > 30) { fs -= 2; ctx.font = '900 ' + fs + 'px ' + FONT; }
